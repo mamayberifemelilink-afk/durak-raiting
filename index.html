@@ -617,6 +617,32 @@
                 padding: 10px;
             }
         }
+
+        /* FAQ */
+.faq-btn {
+    margin-top: 10px;
+    padding: 8px 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: #aaa;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.faq-btn:hover { background: rgba(255,255,255,0.05); color: #fff; border-color: #f0d78c; }
+.faq-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+.faq-tab {
+    flex: 1; padding: 8px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.03);
+    color: #aaa; cursor: pointer; font-weight: 600; font-size: 0.8em;
+    transition: 0.2s; text-align: center;
+}
+.faq-tab.active { border-color: #d4a745; background: rgba(212,167,69,0.2); color: #fff; }
+.faq-content { color: #ccc; font-size: 0.9em; line-height: 1.5; text-align: left; }
+.faq-content p { margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -643,6 +669,7 @@
             </div>
             <button id="btn-start">🎴 НАЧАТЬ ИГРУ</button>
             <button class="promo-btn" onclick="openPromo()">🎁 Промокоды</button>
+            <button class="faq-btn" onclick="openFaq()">❓ FAQ</button>
         </div>
 
         <!-- Модальное окно промокодов -->
@@ -657,6 +684,21 @@
                 <p style="color: #aaa; margin-top: 10px; font-size: 0.8em;" id="promoStatus">Промокоды загружаются...</p>
             </div>
         </div>
+
+        <!-- Модальное окно FAQ -->
+<div class="modal-overlay" id="faqModal">
+    <div class="modal-box" style="max-width: 500px; text-align: left;">
+        <h3 style="text-align:center; color:#f0d78c; margin-bottom:15px;">❓ Частые вопросы</h3>
+        <div class="faq-tabs">
+            <button class="faq-tab active" onclick="switchFaqTab('rules')">📜 Правила игры</button>
+            <button class="faq-tab" onclick="switchFaqTab('stakes')">💰 Ставки</button>
+        </div>
+        <div class="faq-content" id="faqContent"></div>
+        <div style="text-align:center; margin-top:15px;">
+            <button class="close-btn" onclick="closeFaq()">Закрыть</button>
+        </div>
+    </div>
+</div>
 
         <!-- Игра -->
         <div id="gameScreen" class="game">
@@ -1035,6 +1077,37 @@
                 }
                 updateUI();
             }
+
+            // FAQ
+const faqData = {
+    rules: `
+        <p><strong>Цель:</strong> избавиться от всех карт. Кто остаётся с картами — дурак.</p>
+        <p><strong>Ход игры:</strong> один игрок атакует, другой защищается. Атаковать можно картами того же достоинства, что уже лежат на столе. Защита — картой той же масти, но старше, либо козырем.</p>
+        <p><strong>Переводной:</strong> если у защищающегося есть карта того же достоинства, он может перевести атаку следующему игроку.</p>
+        <p><strong>Подкидной:</strong> пока защита не завершена, любой игрок (кроме защищающегося) может подкидывать карты того же достоинства, что уже на столе.</p>
+        <p><strong>Козырь:</strong> определяется случайной картой снизу колоды. Козырь бьёт любую некозырную карту.</p>
+        <p><strong>Завершение:</strong> если защищающийся отбился, он нажимает «Бито» (или боты решают сами). Если не может — забирает все карты со стола и пропускает ход.</p>
+    `,
+    stakes: `
+        <p><strong>Ставки 10 000, 50 000, 100 000 ₽</strong> доступны только на сложности <strong>«Невозможный»</strong>.</p>
+        <p>Это сделано для баланса: большие ставки требуют максимальной внимательности и стратегии. Боты на этом уровне играют почти идеально, используют переводы и берегут козыри.</p>
+        <p>Если вы хотите играть на высоких ставках, выберите «Невозможную» сложность — тогда все ставки станут доступны.</p>
+    `
+};
+
+function switchFaqTab(tab) {
+    document.querySelectorAll('.faq-tab').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.faq-tab[onclick="switchFaqTab('${tab}')"]`).classList.add('active');
+    document.getElementById('faqContent').innerHTML = faqData[tab] || '';
+}
+
+function openFaq() {
+    document.getElementById('faqModal').classList.add('show');
+    switchFaqTab('rules');
+}
+function closeFaq() {
+    document.getElementById('faqModal').classList.remove('show');
+}
 
             // ---------- БОТЫ (с учётом ожидания игрока) ----------
             function highlightBot(playerId) {
