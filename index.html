@@ -351,14 +351,14 @@
         document.querySelectorAll('.faq-tab').forEach(el => el.classList.remove('active'));
         document.querySelector(`.faq-tab[onclick="switchFaqTab('${tab}')"]`).classList.add('active');
         document.getElementById('faqContent').innerHTML = faqData[tab] || '';
-    }
+    } window.switchFaqTab = switchFaqTab;
     function openFaq() {
         document.getElementById('faqModal').classList.add('show');
         switchFaqTab('rules');
-    }
+    } window.openFaq = openFaq;
     function closeFaq() {
         document.getElementById('faqModal').classList.remove('show');
-    }
+    } window.closeFaq = closeFaq;
 
     // ========== ИГРОВАЯ МЕХАНИКА ==========
     function createDeck() {
