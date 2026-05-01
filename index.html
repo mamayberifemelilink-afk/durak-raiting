@@ -119,7 +119,15 @@
         .bot-cards-count { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 8px; font-size: 1.1em; font-weight: 700; color: #f0d78c; }
         .bot-cards-count .card-icon { font-size: 1.3em; }
         .status { display: inline-block; padding: 4px 14px; border-radius: 12px; font-size: 0.75em; font-weight: 700; margin-top: 6px; letter-spacing: 1px; }
-        .status.def { background: #c0392b; } .status.att { background: #e67e22; } .status.wait { background: #555; color: #aaa; } .status.out { background: #27ae60; }
+        .status.def { background: #c0392b; } .status.att { background: #e67e22; } .status.wait { background: #555; color: #aaa; } .status.out { background: #27ae60; } .crown {
+    font-size: 1.2em;
+    margin-right: 4px;
+    animation: crownBounce 1s infinite;
+}
+@keyframes crownBounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
         .table {
             background: rgba(0,0,0,0.4); border-radius: 24px; min-height: 140px; padding: 20px;
             display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
@@ -435,6 +443,8 @@
             let p=state.players[idx];
             while (p.hand.length<6 && state.deck.length) p.hand.push(state.deck.pop());
             if (p.hand.length===0 && state.deck.length===0) p.out=true;
+            if (p.out && p.isHuman) notify('🎉 Вы избавились от всех карт! Вы победили!', '#2ecc71');
+else if (p.out && !p.isHuman) notify(`${p.name} вышел из игры!`, '#27ae60');
         }
         state.table=[]; state.transferUsed=[];
         const active = state.players.filter(p=>!p.out && p.hand.length>0);
@@ -688,6 +698,10 @@
 
     // Рендеринг
     function renderActions() {
+        if (state.players[0].out) {
+    $actionBar.innerHTML = '<span style="color:#f0d78c; font-weight:700;">👑 Вы победили! Ожидайте завершения игры.</span>';
+    return;
+}
         let html = '';
         const def = state.players[state.defenderIdx];
         const allDef = state.table.every(p=>p.defend);
@@ -736,7 +750,7 @@
             if (p.id===state.attackerIdx && state.table.length===0) cls += ' attacker';
             const st = p.out?'out':(p.id===state.defenderIdx?'def':(p.id===state.attackerIdx&&state.table.length===0?'att':'wait'));
             html += `<div class="${cls}" data-player-id="${p.id}">
-                <div class="bot-name">${p.name}</div>
+    <div class="bot-name">${p.out ? '<span class="crown">👑</span>' : ''}${p.name}</div>
                 <div class="bot-cards-count"><span class="card-icon">🃏</span> <span>${p.hand.length}</span></div>
                 <div class="status ${st}">${p.out?'Вышел':(st==='def'?'🛡 Защита':(st==='att'?'⚔ Атакует':'Ожидает'))}</div>
             </div>`;
@@ -756,7 +770,7 @@
     }
     function renderHand() {
         const human = state.players[0];
-        if (human.out) { $playerHand.innerHTML = '<span style="color:#888;">Вы вышли</span>'; return; }
+        if (human.out) { $playerHand.innerHTML = '<span style="color:#f0d78c; font-weight:700;">👑 Вы победили! Ожидайте завершения игры.</span>'; return; }
         let html = '';
         human.hand.forEach(c=>{
     html += `<div class="card ${cardColor(c)}${isTrump(c) ? ' trump-card' : ''}" data-id="${c.id}" onclick="handleCardClick('${c.id}')">
