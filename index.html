@@ -852,6 +852,18 @@
                 return set;
             }
 
+            // FAQ
+const faqData = { ... }; // весь объект faqData
+
+function switchFaqTab(tab) { ... }
+function openFaq() { ... }
+function closeFaq() { ... }
+
+// ===== ПОИСК: firstAttacker =====
+function startGame() {
+    ...
+}
+
             function startGame() {
                 if (state.bet > state.balance) { notify('Недостаточно средств!', '#c0392b'); return; }
                 state.deck = shuffle(createDeck());
